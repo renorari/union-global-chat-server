@@ -10,7 +10,7 @@ import zlib
 bp = Blueprint("version_1", url_prefix="/api/v1")
 
 db = TinyDB('db.json')
-db_content = TinyDB("contents.json')
+db_content = TinyDB("contents.json")
 user = Query()
 
 def dumper(data):
@@ -71,4 +71,6 @@ async def send(request, userid):
     return response.json({"success": True})
                     
 @bp.get("/channels")
-async def contents(request
+@authorized()
+async def contents(request, userid):
+    return response.json(db_content.all())
