@@ -2,6 +2,7 @@ from tinydb import TinyDB, Query
 from sanic import Sanic, response
 from orjson import dumps, loads
 import zlib
+import asyncio
 from lib import authorized
 
 
@@ -14,6 +15,21 @@ def dumper(data):
     return zlib.compress(dumps(data))
 wss = []
 
+class HeartBeat:
+    def __init__(self, ws):
+        self.ws = ws
+
+    async def send_heartbeat(self):
+        await self.ws.send(dumper({'type': 'heartbeat'}))
+
+    async def sending_heartbeat(self):
+        while True:
+            try:
+                await self.send_heartbeat()
+            except Exception:
+                wss.remove(self.ws)
+                break
+            await asyncio.sleep(10)
 
 @app.websocket("/gateway")
 async def gateway(request, ws):
@@ -33,6 +49,7 @@ async def gateway(request, ws):
             else:
                 await ws.send(dumper({"type": "identify", "success": True}))
                 wss.append(ws)
+                app.loop.create_task(HeartBeat(ws).sending_heartbeat())
 
 @app.post("/api/v1/channels")
 @authorized()
