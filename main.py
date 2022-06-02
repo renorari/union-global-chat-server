@@ -1,6 +1,7 @@
 from tinydb import TinyDB, Query
 from sanic import Sanic, response
 from orjson import dumps, loads
+from data import config
 import zlib
 import asyncio
 from lib import authorized
@@ -65,4 +66,4 @@ async def send(request, userid):
         await ws.send(dumper(payload))
     return response.json({"success": True})
 
-app.run("0.0.0.0", 8080)
+app.run(**config)
