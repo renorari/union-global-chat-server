@@ -10,6 +10,7 @@ import zlib
 bp = Blueprint("version_1", url_prefix="/api/v1")
 
 db = TinyDB('db.json')
+db_content = TinyDB("contents.json')
 user = Query()
 
 def dumper(data):
@@ -65,4 +66,9 @@ async def send(request, userid):
     }
     for ws in wss:
         await ws.send(dumper(payload))
+    data["from"] = userid
+    db_content.insert(data)
     return response.json({"success": True})
+                    
+@bp.get("/channels")
+async def contents(request
