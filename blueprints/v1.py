@@ -1,24 +1,16 @@
-from tinydb import TinyDB, Query
-from sanic import Sanic, response
-from importlib import import_module
-from orjson import dumps, loads
-from data import config
-import zlib
-import os
-import asyncio
+from sanic import Blueprint, response
 from lib import authorized
+from tinydb import TinyDB, Query
+from orjson import dumps, loads
+from types import Content
+import asyncio
+import zlib
 
 
-app = Sanic("ugc-server")
+bp = Blueprint("version_1", url_prefix="/api/v1")
 
 db = TinyDB('db.json')
 user = Query()
-
-for name in os.listdir("blueprints"):
-    if name.endswith(".py"):
-        lib = import_module("blueprints.{}".format(name[:-3]))
-        app.blueprint(lib.bp)
-        lib.app = app
 
 def dumper(data):
     return zlib.compress(dumps(data))
@@ -40,7 +32,7 @@ class HeartBeat:
                 break
             await asyncio.sleep(10)
 
-@app.websocket("/api/v0/gateway")
+@bp.websocket("/gateway")
 async def gateway(request, ws):
     """
     The gateway is the main connection point between the client and the server.
@@ -60,18 +52,17 @@ async def gateway(request, ws):
                 wss.append(ws)
                 app.loop.create_task(HeartBeat(ws).sending_heartbeat())
 
-@app.post("/api/v0/channels")
+@bp.post("/channels")
 @authorized()
 async def send(request, userid):
+    data: Content = request.json
     payload = {
         "type": "send",
         "data": {
             "from": userid,
-            "data": request.json
+            "data": data
         }
     }
     for ws in wss:
         await ws.send(dumper(payload))
     return response.json({"success": True})
-
-app.run(**config)
