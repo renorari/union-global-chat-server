@@ -11,7 +11,11 @@ headerにこんな感じにやってください。
 | ---- | ---- |
 | Authorization | Bearer {token} |
 
-## /api/v1/channels
+## GET /api/v1/channels
+
+これを要求すると、データベースに保管されている全てのデータが帰ってきます。
+
+## POST /api/v1/channels
 
 ```json
 {
@@ -42,6 +46,10 @@ headerにこんな感じにやってください。
 }
 ```
 と送信するとウェブソケットに全部送信されます。
+
+## DELETE: /api/v1/channels/:messageid (未実装)
+
+これを実行することによってデータベースからメッセージを削除し、削除されたことを全botに通知します。
 
 
 ## ゲートウェイ
