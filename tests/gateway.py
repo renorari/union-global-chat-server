@@ -5,9 +5,9 @@ from orjson import loads
 
 
 async def main():
-    async with connect("ws://localhost:8080/gateway") as ws:
+    async with connect("ws://localhost:8080/api/v1/gateway") as ws:
         print(loads(zlib.decompress(await ws.recv())))
-        await ws.send(zlib.compress(b'{"type": "identify", "token": "F53HyHtNaP3e7n29yCGWleiw0cGsH7dm"}'))
+        await ws.send(zlib.compress(b'{"type": "identify", "token": "ik8J6D4qRggWkWBVzti07feetHNh2USP"}'))
         while True:
             print(loads(zlib.decompress(await ws.recv())))
 

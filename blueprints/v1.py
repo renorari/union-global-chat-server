@@ -2,7 +2,6 @@ from sanic import Blueprint, response
 from lib import authorized
 from tinydb import TinyDB, Query
 from orjson import dumps, loads
-from types import Content
 import asyncio
 import zlib
 
@@ -10,8 +9,10 @@ import zlib
 bp = Blueprint("version_1", url_prefix="/api/v1")
 
 db = TinyDB('db.json')
-db_content = TinyDB("contents.json")
+token_table = db.table("token")
+content_table = db.table("content")
 user = Query()
+content = Query()
 
 def dumper(data):
     return zlib.compress(dumps(data))
@@ -44,7 +45,7 @@ async def gateway(request, ws):
     while True:
         data = loads(zlib.decompress(await ws.recv()))
         if data["type"] == "identify":
-            token = db.search(user.token == data["token"])
+            token = token_table.search(user.token == data["token"])
             if len(token) == 0:
                 await ws.send(dumper({"type": "identify", "success": False}))
                 await ws.close()
@@ -56,7 +57,7 @@ async def gateway(request, ws):
 @bp.post("/channels")
 @authorized()
 async def send(request, userid):
-    data: Content = request.json
+    data = request.json
     payload = {
         "type": "send",
         "data": {
@@ -66,11 +67,24 @@ async def send(request, userid):
     }
     for ws in wss:
         await ws.send(dumper(payload))
-    data["from"] = userid
-    db_content.insert(data)
+    data["from_bot"] = userid
+    content_table.insert(data)
     return response.json({"success": True})
                     
 @bp.get("/channels")
 @authorized()
 async def contents(request, userid):
-    return response.json(db_content.all())
+    return response.json(content_table.all())
+
+@bp.delete("/channels/<message_id>")
+@authorized()
+async def delete_content(request, userid, message_id):
+    check = content_table.search(content.from_bot == userid)
+    if len(check) == 0:
+        return response.json({"success": False}, status=401)
+    data = content_table.search(content.message.id == message_id)
+    if len(data) == 0:
+        return response.json({"success": False}, status=404)
+    else:
+        content_table.remove(content.message.id == message_id)
+        return response.json({"success": True}) 

@@ -1,6 +1,6 @@
 import requests
 
-token = "F53HyHtNaP3e7n29yCGWleiw0cGsH7dm"
+token = "ik8J6D4qRggWkWBVzti07feetHNh2USP"
 
 def request(method: str, url: str, *args, **kwargs):
     kwargs["headers"] = {"Authorization": "Bearer {}".format(token)}
@@ -8,6 +8,8 @@ def request(method: str, url: str, *args, **kwargs):
 
 
 def send():
-    request("POST", "/channels", json={"test": "test"})
+    request("POST", "/channels", json={"test": "test", "message": {"id": 98298392}})
+    print(request("GET", "/channels").json())
+    print(request("DELETE", "/channels/98298392").json())
 
 send()
