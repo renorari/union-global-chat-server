@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 db.json
 config.json
+
+# Renorari Server
+start.sh
