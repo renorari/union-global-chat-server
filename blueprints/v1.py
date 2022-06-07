@@ -82,7 +82,11 @@ async def contents(request, userid):
 @authorized()
 async def getUser(self, userid, message_id):
     query = Query()
-    return response.json(content_table.search(query.message.id == message_id)[0])
+    data = content_table.search(query.message.id == message_id)
+    if len(data) == 0:
+        return response.json({"success": False}}, status=404)
+    else:
+        return response.json(data[0])
 
 @bp.delete("/channels/<message_id>")
 @authorized()
