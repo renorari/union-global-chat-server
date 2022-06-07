@@ -35,3 +35,4 @@ axios.get("https://ugc.renorari.net/api/v1/channels", {
         Authorization: `Bearer ${token}``
     }
 });
+```
