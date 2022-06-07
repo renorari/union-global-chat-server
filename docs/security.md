@@ -1,0 +1,33 @@
+# 認証
+
+## 方式
+
+主にヘッダーを用いて認証します。
+
+事前に管理者からトークンが渡されるのでそれで認証してください。
+
+## 例
+
+### Python
+```python
+import requests
+
+
+token = ""
+
+requests.get("https://ugc.renorari.net/api/v1/channels", headers={
+    "Authorization": f"Bearer {token}"
+})
+```
+
+### JavaScript
+
+```js
+const axios = require("axios");
+const token = "";
+
+axios.get("https://ugc.renorari.net/api/v1/channels", {
+    headers: {
+        Authorization: `Bearer ${token}``
+    }
+});
