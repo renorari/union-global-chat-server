@@ -32,7 +32,7 @@ const token = "";
 
 axios.get("https://ugc.renorari.net/api/v1/channels", {
     headers: {
-        Authorization: `Bearer ${token}``
+        Authorization: `Bearer ${token}`
     }
 });
 ```
