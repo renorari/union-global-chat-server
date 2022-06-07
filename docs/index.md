@@ -11,8 +11,8 @@
 
 ## ドキュメント一覧
 
-[認証](/security)
+[認証](security)
 
-[ゲートウェイ](/gateway)
+[ゲートウェイ](gateway)
 
-[channels](/channels)
+[channels](channels)
