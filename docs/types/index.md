@@ -13,3 +13,7 @@
 | guild | [GuildType](./#GuildType) | 送信元サーバー |
 | from_bot | str | どのbotがこのデータを送信したか |
 | message | [MessageType](./#MessageType) | メッセージコンテンツ
+
+## ChannelType
+
+| 名前 | タイプ | 説明 |
