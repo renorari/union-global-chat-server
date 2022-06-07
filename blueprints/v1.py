@@ -84,7 +84,7 @@ async def getUser(self, userid, message_id):
     query = Query()
     data = content_table.search(query.message.id == message_id)
     if len(data) == 0:
-        return response.json({"success": False}}, status=404)
+        return response.json({"success": False}, status=404)
     else:
         return response.json(data[0])
 
