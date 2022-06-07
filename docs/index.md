@@ -1,83 +1,16 @@
 # 仕様
 
-## api url
+## base url
 
-localhost
+`ugc.renorari.net/api/v{version}`
 
-## 認証
-
-headerにこんな感じにやってください。
-| 名前 | 値 |
+## バージョン
+| 番号 | ステータス |
 | ---- | ---- |
-| Authorization | Bearer {token} |
+| 1 | stable |
 
-## GET /api/v1/channels
+## ドキュメント一覧
 
-これを要求すると、データベースに保管されている全てのデータが帰ってきます。
-
-## POST /api/v1/channels
-
-```json
-{
-    "channel": {
-        "name": "text",
-        "id": "000000000"
-    },
-    "author": {
-        "username": "name",
-        "discriminator": "8888",
-        "id": "000000000",
-        "avatarURL": "URL(png, dynamic, 512)",
-        "bot": false
-    },
-    "guild": {
-        "name": "KGC",
-        "id": "000000000",
-        "iconURL": "URL(png, dynamic, 256)"
-    },
-    "message": {
-        "content": "",
-        "id": "",
-        "cleanContent": "メンション等を省いたcontent",
-        "?reference": "",
-        "?attachments": [{"name": "filename", "url": "fileurl", "?height": "height", "?width": "width", "content_type": "file’s content_type"}],
-        "embeds": []
-     }
-}
-```
-と送信するとウェブソケットに全部送信されます。
-
-## DELETE: /api/v1/channels/:messageid (未実装)
-
-これを実行することによってデータベースからメッセージを削除し、削除されたことを全botに通知します。
-
-
-## ゲートウェイ
-
-### 概要
-
-主にウェブソケットを使います。
-
-### 送信及び受信
-
-主にjsonを[これ](http://zlib.net/)使って圧縮して送信します。
-
-### 認証
-
-```json
-{
-    "type": "identify",
-    "data": {
-        "token": "トークン"
-    }
-}
-```
-
-と送信し、成功するとこれが帰ってきます。
-
-```json
-{
-    "type": "identify",
-    "success": true
-}
-```
+[認証](/security)
+[ゲートウェイ](/gateway)
+[channels](/channels)
