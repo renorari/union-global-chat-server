@@ -65,8 +65,10 @@ async def send(request, userid):
             "data": data
         }
     }
-    for ws in wss:
-        await ws.send(dumper(payload))
+    try:
+        await asyncio.gather(*[ws.send(dumper(payload)) for ws in wss])
+    except Exception:
+        pass
     data["from_bot"] = userid
     content_table.insert(data)
     return response.json({"success": True})
@@ -86,5 +88,16 @@ async def delete_content(request, userid, message_id):
     if len(data) == 0:
         return response.json({"success": False}, status=404)
     else:
+        payload = {
+            "type": "delete",
+            "data": {
+                "from": userid,
+                "messageid": message_id
+            }
+        }
+        try:
+            await asyncio.gather(*[ws.send(dumper(payload)) for ws in wss])
+        except Exception:
+            pass
         content_table.remove(content.message.id == message_id)
         return response.json({"success": True}) 
