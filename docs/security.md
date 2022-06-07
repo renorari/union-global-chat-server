@@ -26,7 +26,7 @@ requests.get("https://ugc.renorari.net/api/v1/channels", headers={
 
 ### JavaScript
 
-```js
+```javascript
 const axios = require("axios");
 const token = "";
 
