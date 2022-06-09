@@ -1,5 +1,5 @@
-from sanic import Blueprint, response
-from lib import authorized
+from sanic import Blueprint
+from lib import authorized, json
 from tinydb import TinyDB, Query
 from orjson import dumps, loads
 import asyncio
@@ -59,7 +59,7 @@ async def gateway(request, ws):
 async def send(request, userid):
     data = request.json
     if "discord.gg" in data["message"]["content"]:
-        return response.json({"success": False})
+        return json(message="招待リンクを検知しました", status=500)
     payload = {
         "type": "send",
         "data": {
@@ -73,7 +73,7 @@ async def send(request, userid):
         pass
     data["from_bot"] = userid
     content_table.insert(data)
-    return response.json({"success": True})
+    return response.json(message="送信できました")
                     
 @bp.get("/channels")
 @authorized()
@@ -86,20 +86,20 @@ async def getUser(self, userid, message_id):
     query = Query()
     data = content_table.search(query.message.id == message_id)
     if len(data) == 0:
-        return response.json({"success": False}, status=404)
+        return json(message="メッセージが見当たりません", status=404)
     else:
-        return response.json(data[0])
+        return json(data[0])
 
 @bp.delete("/channels/<message_id>")
 @authorized()
 async def delete_content(request, userid, message_id):
-    check = content_table.search(content.from_bot == userid)
-    if len(check) == 0:
-        return response.json({"success": False}, status=401)
     data = content_table.search(content.message.id == message_id)
     if len(data) == 0:
-        return response.json({"success": False}, status=404)
+        return response.json(status=404, message="そのメッセージは見つかりません")
     else:
+        check = content_table.search(content.from_bot == userid)
+        if len(check) == 0:
+            return json(status=401, message="別のbotから送信されていますので、削除できません。")
         payload = {
             "type": "delete",
             "data": {
@@ -112,4 +112,4 @@ async def delete_content(request, userid, message_id):
         except Exception:
             pass
         content_table.remove(content.message.id == message_id)
-        return response.json({"success": True}) 
+        return json() 
