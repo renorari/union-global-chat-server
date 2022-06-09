@@ -58,6 +58,8 @@ async def gateway(request, ws):
 @authorized()
 async def send(request, userid):
     data = request.json
+    if "discord.gg" in data["message"]["content"]:
+        return response.json({"success": False})
     payload = {
         "type": "send",
         "data": {
