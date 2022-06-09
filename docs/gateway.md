@@ -27,3 +27,18 @@
     "success": true
 }
 ```
+
+## heartbeat
+
+```json
+{
+    "type": "heartbeat",
+    "data": {
+        "unix_time": unix timeが返される(integer)
+    }
+}
+```
+
+`unix_time`を用いて通信速度を測定してください。
+
+`10`秒間に一回は送信されます。
