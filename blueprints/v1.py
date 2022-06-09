@@ -14,8 +14,13 @@ content_table = db.table("content")
 user = Query()
 content = Query()
 
-def dumper(data):
-    return zlib.compress(dumps(data))
+def dumper(type: str, data: dict=None, *, success: bool=True):
+    payload = {
+        "type": type,
+        "data": data,
+        "success": success
+    }
+    return zlib.compress(dumps(payload))
 wss = []
 
 class HeartBeat:
@@ -23,7 +28,7 @@ class HeartBeat:
         self.ws = ws
 
     async def send_heartbeat(self):
-        await self.ws.send(dumper({'type': 'heartbeat'}))
+        await self.ws.send(dumper('heartbeat'))
 
     async def sending_heartbeat(self):
         while True:
@@ -41,16 +46,16 @@ async def gateway(request, ws):
     It is responsible for receiving the client's messages and sending them to
     the right place.
     """
-    await ws.send(dumper({"type": "hello"}))
+    await ws.send(dumper("hello"))
     while True:
         data = loads(zlib.decompress(await ws.recv()))
         if data["type"] == "identify":
             token = token_table.search(user.token == data["token"])
             if len(token) == 0:
-                await ws.send(dumper({"type": "identify", "success": False}))
+                await ws.send(dumper("identify", success=False}))
                 await ws.close()
             else:
-                await ws.send(dumper({"type": "identify", "success": True}))
+                await ws.send(dumper("identify"))
                 wss.append(ws)
                 app.loop.create_task(HeartBeat(ws).sending_heartbeat())
 
@@ -68,7 +73,7 @@ async def send(request, userid):
         }
     }
     try:
-        await asyncio.gather(*[ws.send(dumper(payload)) for ws in wss])
+        await asyncio.gather(*[ws.send(dumper(**payload)) for ws in wss])
     except Exception:
         pass
     data["from_bot"] = userid
@@ -108,7 +113,7 @@ async def delete_content(request, userid, message_id):
             }
         }
         try:
-            await asyncio.gather(*[ws.send(dumper(payload)) for ws in wss])
+            await asyncio.gather(*[ws.send(dumper(**payload)) for ws in wss])
         except Exception:
             pass
         content_table.remove(content.message.id == message_id)
