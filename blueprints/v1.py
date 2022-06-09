@@ -2,6 +2,7 @@ from sanic import Blueprint
 from lib import authorized, json
 from tinydb import TinyDB, Query
 from orjson import dumps, loads
+from time import time
 import asyncio
 import zlib
 
@@ -28,7 +29,7 @@ class HeartBeat:
         self.ws = ws
 
     async def send_heartbeat(self):
-        await self.ws.send(dumper('heartbeat'))
+        await self.ws.send(dumper('heartbeat', {"unix_time": time()}))
 
     async def sending_heartbeat(self):
         while True:
